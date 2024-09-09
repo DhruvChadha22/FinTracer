@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function() {
+export const KeyFeatures = () => {
     return <div id="features" className="py-20 md:py-32 border-t border-emerald-600">
         <div className="container px-4 md:px-6 space-y-12">
             <div className="text-center space-y-4">
@@ -49,7 +49,7 @@ export default function() {
             </div>
         </div>
     </div>
-}
+};
 
 function FeatureCard({ heading, text, src, alt }: { heading: string, text: string, src: string, alt: string }) {
     return <div className="bg-gradient-to-b from-green-300 to-green-200 p-6 rounded-lg shadow-md hover:bg-white hover:scale-105 transition ease-in-out">
@@ -61,4 +61,4 @@ function FeatureCard({ heading, text, src, alt }: { heading: string, text: strin
             {text}
         </p>
     </div>
-}
+};

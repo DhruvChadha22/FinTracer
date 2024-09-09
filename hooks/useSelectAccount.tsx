@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useGetAccounts } from "@/hooks/accounts/api/useGetAccounts";
-import CustomSelect from "@/components/CustomSelect";
+import { CustomSelect } from "@/components/CustomSelect";
 import { Button } from "@/components/ui/button";
 import { 
     Dialog, 

@@ -183,6 +183,7 @@ const app = new Hono()
                 const remaining = budget.amount - expense;
 
                 return {
+                    id: budget.id,
                     name: budget.name,
                     value: budget.amount,
                     remaining: remaining,
@@ -197,6 +198,7 @@ const app = new Hono()
             const finalBudgets = topBudgets;
             if (otherBudgets.length > 0) {
                 const otherBudgetsSum = otherBudgets.reduce((sum, current) => ({
+                    id: "other",
                     name: "Other",
                     value: sum.value + current.value,
                     remaining: sum.remaining + current.remaining,

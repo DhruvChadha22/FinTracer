@@ -20,7 +20,7 @@ import {
     PopoverClose,
 } from "@/components/ui/popover";
 
-export default function() {
+export const DateFilter = () => {
     const router = useRouter();
     const pathname = usePathname();
 
@@ -107,4 +107,4 @@ export default function() {
             </div>
         </PopoverContent>
     </Popover>
-}   
+};

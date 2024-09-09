@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import ImportTable from "@/components/ImportTable";
+import { ImportTable } from "@/components/ImportTable";
 import { convertAmountToMiliUnits } from "@/lib/utils";
 import { format, parse } from "date-fns";
 
@@ -24,11 +24,11 @@ type Props = {
     onSubmit: (data: any) => void;
 };
 
-export default function({
+export const ImportCard = ({
     data,
     onCancel,
     onSubmit,
-}: Props) {
+}: Props) => {
     const [selectedColumns, setSelectedColumns] = useState<SelectedColumnsState>({});
 
     const headers = data[0];
@@ -121,4 +121,4 @@ export default function({
             </CardContent>
         </Card>
     </div>
-}
+};

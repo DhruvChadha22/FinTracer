@@ -10,7 +10,7 @@ import { client } from "@/lib/hono";
 import { Actions } from "./actions"
 import { format } from "date-fns"
 import { cn, formatCurrency } from "@/lib/utils"
-import CategoryColumn from "@/components/CategoryColumn"
+import { CategoryColumn } from "@/components/CategoryColumn"
 
 export type ResponseType = InferResponseType<typeof client.api.budgets.$get, 200>["data"][0];
 type Props = {

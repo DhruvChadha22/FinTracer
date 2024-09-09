@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function() {
+export const Footer = () => {
     return <div className="text-white py-8">
         <div className="container flex flex-col md:flex-row items-center justify-between">
             <Link className="flex items-center gap-2" href="/">
@@ -21,4 +21,4 @@ export default function() {
             </div>
         </div>
   </div>
-}
+};

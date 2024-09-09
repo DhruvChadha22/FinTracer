@@ -1,5 +1,5 @@
-import Appbar from "@/components/Appbar";
-import Sidebar from "@/components/Sidebar";
+import { Appbar } from "@/components/Appbar";
+import { Sidebar } from "@/components/Sidebar";
 import { SheetProvider } from "@/providers/sheetProvider";
 import { Toaster } from "@/components/ui/sonner";
 

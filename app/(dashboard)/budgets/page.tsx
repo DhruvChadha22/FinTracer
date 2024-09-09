@@ -10,7 +10,7 @@ import { useGetBudgets } from "@/hooks/budgets/api/useGetBudgets";
 import { useDeleteBudgets } from "@/hooks/budgets/api/useDeleteBudgets";
 
 
-export default function() {
+export default function BudgetsPage() {
     const { onOpen } = useNewBudget();
 
     const deleteBudgets = useDeleteBudgets();
@@ -58,4 +58,4 @@ export default function() {
             </CardContent>
         </Card>
     </div>
-}
+};

@@ -40,9 +40,9 @@ const routes = [
         src: "/budget-icon.svg",
         alt: "Budget-Icon"
     }
-]
+];
 
-export default function() {
+export const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
     
     const pathname = usePathname();
@@ -112,4 +112,4 @@ export default function() {
             ))}
         </div>
     </div>
-}
+};

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-export default function() {
+export const ContactUs = () => {
     return <div id="contact" className="w-full py-12 md:py-24 lg:py-32 border-t border-emerald-600 text-white">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
@@ -23,4 +23,4 @@ export default function() {
             </div>
         </div>
     </div>
-}
+};

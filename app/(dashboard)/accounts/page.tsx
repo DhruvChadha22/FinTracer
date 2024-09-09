@@ -3,15 +3,15 @@
 import { FileSearch, Loader2, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import AccountCards from "@/components/AccountCards";
-import BankFilter from "@/components/BankFilter";
-import PlaidLink from "@/components/PlaidLink";
-import DeactivateAccount from "@/components/DeactivateAccount";
+import { AccountCards } from "@/components/AccountCards";
+import { BankFilter } from "@/components/BankFilter";
+import { PlaidLink } from "@/components/PlaidLink";
+import { DeactivateAccount } from "@/components/DeactivateAccount";
 import { useGetBankNames } from "@/hooks/accounts/api/useGetBankNames";
 import { useSyncBalances } from "@/hooks/accounts/api/useSyncBalances";
 
 
-export default function() {
+export default function AccountsPage() {
     const getBanksQuery = useGetBankNames();
     const syncBalances = useSyncBalances();
 
@@ -74,4 +74,4 @@ export default function() {
             </CardContent>
         </Card>
     </div>
-}
+};

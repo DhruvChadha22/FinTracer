@@ -10,12 +10,12 @@ type Props = {
     disabled?: boolean;
 };
 
-export default function({
+export const AmountInputTxn = ({
     value,
     onChange,
     placeholder,
     disabled
-}: Props) {
+}: Props) => {
     const parsedValue = parseFloat(value);
     const isIncome = parsedValue > 0;
     const isExpense = parsedValue < 0;
@@ -65,4 +65,4 @@ export default function({
             {isExpense && "This will count as an expense"}
         </p>
     </div>
-}
+};

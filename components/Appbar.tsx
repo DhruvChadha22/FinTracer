@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function() {
+export const Appbar = () => {
     return <div className="absolute inset-0 z-20 h-fit">
     <div className="fixed w-full">
         <div className="hidden lg:flex">
@@ -24,4 +24,4 @@ export default function() {
         </div>
     </div>
     </div>
-}
+};

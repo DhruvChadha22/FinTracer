@@ -5,9 +5,9 @@ import { FaArrowTrendDown, FaArrowTrendUp } from "react-icons/fa6";
 import { formatDateRange } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { useGetOverview } from "@/hooks/overview/api/useGetOverview";
-import { DataCard, DataCardSkeleton } from "@/components/DataCard";
+import { DataCard, DataCardLoading } from "@/components/DataCard";
 
-export default function() {
+export const DataGrid = () => {
     const { data, isLoading } = useGetOverview();
 
     const params = useSearchParams();
@@ -18,9 +18,9 @@ export default function() {
     
     if (isLoading) {
         return <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <DataCardSkeleton />
-            <DataCardSkeleton />
-            <DataCardSkeleton />
+            <DataCardLoading />
+            <DataCardLoading />
+            <DataCardLoading />
         </div>
     }
 
@@ -50,4 +50,4 @@ export default function() {
             dateRange={dateRangeLabel}
         />
     </div>
-}
+};

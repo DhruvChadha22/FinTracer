@@ -4,7 +4,7 @@ import * as React from "react"
 import { Plus, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"
-import UploadButton from "@/components/UploadButton";
+import { UploadButton } from "@/components/UploadButton";
 
 import { useConfirm } from "@/hooks/useConfirm";
 
@@ -192,4 +192,4 @@ export function DataTable<TData, TValue>({
         </div>
     </div>
   )
-}
+};

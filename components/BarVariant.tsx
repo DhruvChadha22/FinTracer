@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis } from "recharts";
-import CustomTooltip from "@/components/CustomTooltip";
+import { CustomTooltip } from "@/components/CustomTooltip";
 
 type Props = {
     data: {
@@ -10,7 +10,7 @@ type Props = {
     }[];
 };
 
-export default function({ data }: Props) {
+export const BarVariant = ({ data }: Props) => {
     return <ResponsiveContainer width="100%" height={350}>
         <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -35,4 +35,4 @@ export default function({ data }: Props) {
             />
         </BarChart>
     </ResponsiveContainer>
-}
+};

@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 
-export default function() {
+export const About = () => {
     return <div id="about" className="w-full py-12 md:py-24 lg:py-32 border-t border-emerald-600">
         <div className="container grid items-center gap-6 px-4 md:px-6 lg:grid-cols-2 lg:gap-10">
             <div className="space-y-2">
@@ -19,12 +20,12 @@ export default function() {
                 </Link>
             </div>
             <div>
-                <img
+                <Image
                     alt="About"
                     className="mx-auto aspect-video overflow-hidden rounded-xl object-cover object-center sm:w-full lg:order-last"
-                    height="310"
+                    height={310}
                     src="/about-page.svg"
-                    width="550"
+                    width={550}
                 />
                 <span className="flex justify-end mt-1 pr-4 text-xs text-muted">
                     Designed by
@@ -34,4 +35,4 @@ export default function() {
             </div>
         </div>
   </div>
-}
+};

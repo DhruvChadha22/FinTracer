@@ -5,9 +5,9 @@ import { Loader2, Plus, RefreshCcw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
-import UploadButton from "@/components/UploadButton";
-import ImportCard from "@/components/ImportCard";
-import Filters from "@/components/Filters";
+import { UploadButton } from "@/components/UploadButton";
+import { ImportCard } from "@/components/ImportCard";
+import { Filters } from "@/components/Filters";
 import { columns } from "./columns";
 import { useNewTransaction } from "@/hooks/transactions/store/useNewTransaction";
 import { useGetTransactions } from "@/hooks/transactions/api/useGetTransactions";
@@ -34,7 +34,7 @@ type Transactions = {
     date: Date;
 };
 
-export default function() {
+export default function TransactionsPage() {
     const [AccountDialog, confirm] = useSelectAccount();
     const [variant, setVariant] = useState<VARIANTS>(VARIANTS.LIST);
     const [importResults, setImportResults] = useState(INITIAL_IMPORT_RESULTS);
@@ -146,4 +146,4 @@ export default function() {
             </CardContent>
         </Card>
     </div>
-}
+};

@@ -7,7 +7,7 @@ type Props = {
     }[];
 };
 
-export default function({ data }: Props) {
+export const RadarVariant = ({ data }: Props) => {
     return <ResponsiveContainer width="100%" height={350}>
         <RadarChart
             cx="50%"
@@ -26,4 +26,4 @@ export default function({ data }: Props) {
             />
         </RadarChart>
     </ResponsiveContainer>
-}
+};

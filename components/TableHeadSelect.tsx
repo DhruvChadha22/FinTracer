@@ -13,11 +13,11 @@ const options = [
     "date",
 ];
 
-export default function({
+export const TableHeadSelect = ({
     columnIndex,
     selectedColumns,
     onChange,
-}: Props) {
+}: Props) => {
     const currentSelection = selectedColumns[`column_${columnIndex}`];
 
     return <Select
@@ -48,4 +48,4 @@ export default function({
             })}
         </SelectContent>
     </Select>
-}
+};

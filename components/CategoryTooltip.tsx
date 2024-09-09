@@ -1,7 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/utils";
 
-export default function({ active, payload }: any) {
+export const CategoryTooltip = ({ active, payload }: any) => {
     if (!active) return null;
 
     const name = payload[0].payload.name;
@@ -26,4 +26,4 @@ export default function({ active, payload }: any) {
             </div>
         </div>
     </div>
-}
+};

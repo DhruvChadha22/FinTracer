@@ -5,7 +5,7 @@ import { formatCurrency } from '@/lib/utils';
 import { useUser } from '@clerk/nextjs';
 import { useGetAccounts } from '@/hooks/accounts/api/useGetAccounts';
 
-export default function() {
+export const AccountCards = () => {
     const { isLoaded, user } = useUser();
     const accountsQuery = useGetAccounts();
     const accounts = accountsQuery.data || [];
@@ -72,4 +72,4 @@ export default function() {
             </div>
         ))}
     </div>
-}
+};

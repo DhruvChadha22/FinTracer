@@ -6,7 +6,7 @@ type Props = {
     onUpload?: (results: any) => void;
 };
 
-export default function({ onUpload }: Props) {
+export const UploadButton = ({ onUpload }: Props) => {
     const { CSVReader } = useCSVReader();
 
     return <CSVReader onUploadAccepted={onUpload}>
@@ -21,4 +21,4 @@ export default function({ onUpload }: Props) {
             </Button>
         )}
     </CSVReader>
-}
+};

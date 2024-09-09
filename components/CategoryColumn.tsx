@@ -11,12 +11,12 @@ type Props = {
     isTransaction: boolean;
 };
 
-export default function({
+export const CategoryColumn = ({
     id,
     category,
     categoryId,
     isTransaction,
-}: Props) {
+}: Props) => {
     const { onOpen: onOpenCategory } = useOpenCategory();
     const { onOpen: onOpenTransaction } = useOpenTransaction();
     const { onOpen: onOpenBudget } = useOpenBudget();
@@ -58,4 +58,4 @@ export default function({
             </div>
         )}
     </div>
-}
+};

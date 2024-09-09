@@ -1,4 +1,4 @@
-import TableHeadSelect from "./TableHeadSelect";
+import { TableHeadSelect } from "@/components/TableHeadSelect";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
 type Props = {
@@ -8,12 +8,12 @@ type Props = {
     onTableHeadSelectChange: (columnIndex: number, value: string | null) => void;
 };
 
-export default function({
+export const ImportTable = ({
     headers,
     body,
     selectedColumns,
     onTableHeadSelectChange,
-}: Props) {
+}: Props) => {
     return <div className="rounded-md border overflow-hidden">
         <Table>
             <TableHeader className="bg-muted">
@@ -42,4 +42,4 @@ export default function({
             </TableBody>
         </Table>
     </div>
-}
+};

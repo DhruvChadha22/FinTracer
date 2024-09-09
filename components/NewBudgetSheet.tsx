@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { useNewBudget } from "@/hooks/budgets/store/useNewBudget";
 import { useCreateBudget } from "@/hooks/budgets/api/useCreateBudget";
-import BudgetForm from "@/components/BudgetForm";
+import { BudgetForm } from "@/components/BudgetForm";
 import { BudgetsModel } from "@/prisma/zod";
 import { 
     Sheet, 
@@ -23,7 +23,7 @@ const formSchema = BudgetsModel.omit({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function() {
+export const NewBudgetSheet = () => {
     const { isOpen, onClose } = useNewBudget();
 
     const createMutation = useCreateBudget();
@@ -76,4 +76,4 @@ export default function() {
             }    
         </SheetContent>
     </Sheet>
-}
+};

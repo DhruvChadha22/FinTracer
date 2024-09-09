@@ -3,7 +3,7 @@ import Image from "next/image";
 import { ClerkLoaded, ClerkLoading, SignUp } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 
-export default function() {
+export default function SignUpPage() {
     return <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
         <div className="col-span-1 hidden lg:flex items-end justify-center">
             <Image src="/finance-image-1.svg" alt="Finance-Image" height={512} width={512}/>
@@ -30,4 +30,4 @@ export default function() {
             </span>
         </div>
     </div>
-}
+};

@@ -3,9 +3,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { BudgetsModel } from "@/prisma/zod";
 import { convertAmountToMiliUnits } from "@/lib/utils";
 import { useForm } from "react-hook-form";
-import AmountInputBudget from "@/components/AmountInputBudget";
-import DatePicker from "@/components/DatePicker";
-import CustomSelect from "@/components/CustomSelect";
+import { AmountInputBudget } from "@/components/AmountInputBudget";
+import { DatePicker } from "@/components/DatePicker";
+import { CustomSelect } from "@/components/CustomSelect";
 import { Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -46,7 +46,7 @@ type Props = {
     onCreateCategory: (name: string) => void;
 };
 
-export default function({
+export const BudgetForm = ({
     id,
     defaultValues,
     onSubmit,
@@ -54,7 +54,7 @@ export default function({
     disabled,
     categoryOptions,
     onCreateCategory,
-}: Props) {
+}: Props) => {
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: defaultValues
@@ -191,4 +191,4 @@ export default function({
             )}
         </form>
     </Form>
-}
+};

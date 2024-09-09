@@ -16,7 +16,7 @@ import {
     SelectValue
 } from "@/components/ui/select";
 
-export default function() {
+export const AccountFilter = () => {
     const router = useRouter();
     const pathname = usePathname();
 
@@ -73,4 +73,4 @@ export default function() {
             ))}
         </SelectContent>
     </Select>
-}
+};

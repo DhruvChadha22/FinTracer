@@ -6,7 +6,7 @@ import { BudgetProgress, BudgetProgressLoading } from "@/components/BudgetProgre
 import { BalancesCard, BalancesCardLoading } from "@/components/BalancesCard";
 import { useGetOverview } from "@/hooks/overview/api/useGetOverview";
 
-export default function() {
+export const DataCharts = () => {
     const { data, isLoading } = useGetOverview();
 
     if (isLoading) {
@@ -48,4 +48,4 @@ export default function() {
             </div>
         </div>
     </div>
-}
+};

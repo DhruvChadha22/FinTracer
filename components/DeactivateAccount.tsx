@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useConfirm } from "@/hooks/useConfirm";
 import { useDeleteAccount } from "@/hooks/accounts/api/useDeleteAccount";
 
-export default function() {
+export const DeactivateAccount = () => {
     const router = useRouter();
     const pathname = usePathname();
     const params = useSearchParams();
@@ -45,4 +45,4 @@ export default function() {
             Deactivate
         </Button>
     </>
-}
+};

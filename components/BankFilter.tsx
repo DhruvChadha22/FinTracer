@@ -23,10 +23,10 @@ type Props = {
     isLoadingBanks: boolean;
 };
 
-export default function({
+export const BankFilter = ({
     banksData,
     isLoadingBanks
-}: Props) {
+}: Props) => {
     const router = useRouter();
     const params = useSearchParams();
     const itemId = params.get("itemId") || "all";
@@ -70,4 +70,4 @@ export default function({
             </SelectGroup>
         </SelectContent>
     </Select>
-}
+};

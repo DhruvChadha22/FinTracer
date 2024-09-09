@@ -15,7 +15,7 @@ type Props = {
     placeholder?: string;
 };
 
-export default function({
+export const CustomSelect = ({
     onChange,
     onCreate,
     options = [],
@@ -23,7 +23,7 @@ export default function({
     isCreatable,
     disabled,
     placeholder,
-}: Props) {
+}: Props) => {
     const onSelect = (option: SingleValue<{ label: string; value: string; }>) => {
         onChange(option?.value);
     };
@@ -76,4 +76,4 @@ export default function({
             )
         }
     </div>
-}
+};

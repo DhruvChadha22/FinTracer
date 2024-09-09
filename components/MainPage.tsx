@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 
-export default function() {
+export const MainPage = () => {
     return <div className="text-white py-20 md:py-28">
         <div className="container px-4 md:px-6 grid gap-8 md:grid-cols-2 items-center">
             <div className="space-y-4">
@@ -16,16 +17,16 @@ export default function() {
                 </div>
             </div>
             <div>
-                <img
+                <Image
                     alt="Finance Tracking"
                     className="mx-auto rounded-lg"
-                    height="400"
                     src="/finance-tracking.svg"
                     style={{
-                    aspectRatio: "600/400",
-                    objectFit: "cover",
+                        aspectRatio: "600/400",
+                        objectFit: "cover",
                     }}
-                    width="600"
+                    height={400}
+                    width={600}
                 />
                 <span className="flex justify-end mt-1 pr-8 text-xs text-muted">
                     Designed by
@@ -35,4 +36,4 @@ export default function() {
             </div>
         </div>
     </div>
-}
+};

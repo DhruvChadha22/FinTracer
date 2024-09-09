@@ -3,9 +3,9 @@ import { AreaChart, BarChart3, FileSearch, LineChart, Loader2 } from "lucide-rea
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import AreaVariant from "@/components/AreaVariant";
-import BarVariant from "@/components/BarVariant";
-import LineVariant from "@/components/LineVariant";
+import { AreaVariant } from "@/components/AreaVariant";
+import { BarVariant } from "@/components/BarVariant";
+import { LineVariant } from "@/components/LineVariant";
 
 type Props = {
     data?: {

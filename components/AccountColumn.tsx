@@ -7,10 +7,10 @@ type Props = {
     account: string | null;
 };
 
-export default function({
+export const AccountColumn = ({
     id,
     account,
-}: Props) {
+}: Props) => {
     const { onOpen: onOpenTransaction } = useOpenTransaction();
 
     const onClick = () => {
@@ -27,4 +27,4 @@ export default function({
         {!account && <TriangleAlert className="size-4 mr-2 shrink-0" />}
         {account || <span className="text-[12px]">Uncategorized</span>}
     </div>
-}
+};

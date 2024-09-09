@@ -1,13 +1,13 @@
-import Navbar from "@/components/Navbar";
-import MainPage from "@/components/MainPage";
-import KeyFeatures from "@/components/KeyFeatures";
-import About from "@/components/About";
-import ContactUs from "@/components/ContactUs";
-import Footer from "@/components/Footer";
+import { Navbar } from "@/components/Navbar";
+import { MainPage } from "@/components/MainPage";
+import { KeyFeatures } from "@/components/KeyFeatures";
+import { About } from "@/components/About";
+import { ContactUs } from "@/components/ContactUs";
+import { Footer } from "@/components/Footer";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-export default function() {
+export default function LandingPage() {
     const session = auth();
 
     if(session.userId) {
@@ -22,4 +22,4 @@ export default function() {
         <ContactUs />
         <Footer />
     </div>
-}
+};

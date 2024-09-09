@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/utils";
 
-export default function({ active, payload }: any) {
+export const CustomTooltip = ({ active, payload }: any) => {
     if (!active) return null;
 
     const date = payload[0].payload.date;
@@ -39,4 +39,4 @@ export default function({ active, payload }: any) {
             </div>
         </div>
     </div>
-}
+};

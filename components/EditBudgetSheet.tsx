@@ -6,7 +6,7 @@ import { useGetBudget } from "@/hooks/budgets/api/useGetBudget";
 import { useEditBudget } from "@/hooks/budgets/api/useEditBudget";
 import { useDeleteBudget } from "@/hooks/budgets/api/useDeleteBudget";
 import { useConfirm } from "@/hooks/useConfirm";
-import BudgetForm from "@/components/BudgetForm";
+import { BudgetForm } from "@/components/BudgetForm";
 import { BudgetsModel } from "@/prisma/zod";
 import { Loader2 } from "lucide-react";
 import { 
@@ -27,7 +27,7 @@ const formSchema = BudgetsModel.omit({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function() {
+export const EditBudgetSheet = () => {
     const { isOpen, onClose, id } = useOpenBudget();
 
     const budgetQuery = useGetBudget(id);
@@ -119,4 +119,4 @@ export default function() {
             </SheetContent>
         </Sheet>
     </>
-}
+};

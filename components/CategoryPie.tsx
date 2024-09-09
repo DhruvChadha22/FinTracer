@@ -3,9 +3,9 @@ import { FileSearch, Loader2, PieChart, Radar, Target } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import PieVariant from "@/components/PieVariant";
-import RadarVariant from "@/components/RadarVariant";
-import RadialVariant from "@/components/RadialVariant";
+import { PieVariant } from "@/components/PieVariant";
+import { RadarVariant } from "@/components/RadarVariant";
+import { RadialVariant } from "@/components/RadialVariant";
 
 type Props = {
     data?: {

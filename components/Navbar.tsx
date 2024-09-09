@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function() {
+export const Navbar = () => {
     return <div className="text-white px-4 lg:px-6 h-16 flex items-center justify-between">
         <Link className="flex items-center gap-2" href="/">
             <Image src="/logo.svg" alt="Logo" height={30} width={30}/>
@@ -22,4 +22,4 @@ export default function() {
             </Link>
         </div>
     </div>
-}
+};

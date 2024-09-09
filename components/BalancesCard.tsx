@@ -31,6 +31,7 @@ export const BalancesCard = ({ data = [] }: Props) => {
                     <div className="-mt-2 h-[272px]">
                         {data.map((bank) => (
                             <div 
+                                key={bank.name}
                                 className={cn(
                                     "border rounded-lg p-2 mb-1.5 hover:scale-105 transition ease-in-out",
                                     bank.balance > 0 ? "hover:bg-emerald-100" : "hover:bg-rose-100"

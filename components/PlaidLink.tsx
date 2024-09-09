@@ -5,7 +5,7 @@ import { useCreateBank } from "@/hooks/accounts/api/useCreateBank";
 import { useGetLinkToken } from "@/hooks/accounts/api/useGetLinkToken";
 import { useSyncTransactions } from "@/hooks/transactions/api/useSyncTransactions";
 
-export default function() {
+export const PlaidLink = () => {
     const linkQuery = useGetLinkToken();
     const addBankQuery = useCreateBank();
     const syncTransactions = useSyncTransactions();
@@ -27,4 +27,4 @@ export default function() {
         <Link className="size-4 mr-2" />
         Connect Account
     </Button>
-}
+};

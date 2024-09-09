@@ -6,7 +6,7 @@ import { useGetCategory } from "@/hooks/categories/api/useGetCategory";
 import { useEditCategory } from "@/hooks/categories/api/useEditCategory";
 import { useDeleteCategory } from "@/hooks/categories/api/useDeleteCategory";
 import { useConfirm } from "@/hooks/useConfirm";
-import CategoryForm from "@/components/CategoryForm";
+import { CategoryForm } from "@/components/CategoryForm";
 import { CategoriesModel } from "@/prisma/zod";
 import { Loader2 } from "lucide-react";
 import { 
@@ -25,7 +25,7 @@ const formSchema = CategoriesModel.omit({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function() {
+export const EditCategorySheet = () => {
     const { isOpen, onClose, id } = useOpenCategory();
 
     const categoryQuery = useGetCategory(id);
@@ -96,4 +96,4 @@ export default function() {
             </SheetContent>
         </Sheet>
     </>
-}
+};

@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { TransactionsModel } from "@/prisma/zod";
-import TransactionForm from "@/components/TransactionForm";
+import { TransactionForm } from "@/components/TransactionForm";
 import { useNewTransaction } from "@/hooks/transactions/store/useNewTransaction";
 import { useCreateTransaction } from "@/hooks/transactions/api/useCreateTransaction";
 import { useGetCategories } from "@/hooks/categories/api/useGetCategories";
@@ -25,7 +25,7 @@ const formSchema = TransactionsModel.omit({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function() {
+export const NewTransactionSheet = () => {
     const { isOpen, onClose } = useNewTransaction();
 
     const createMutation = useCreateTransaction();
@@ -85,4 +85,4 @@ export default function() {
             }
         </SheetContent>
     </Sheet>
-}
+};

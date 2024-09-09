@@ -4,9 +4,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TransactionsModel } from "@/prisma/zod";
 import { convertAmountToMiliUnits } from "@/lib/utils";
-import DatePicker from "@/components/DatePicker";
-import AmountInputTxn from "@/components/AmountInputTxn";
-import CustomSelect from "@/components/CustomSelect";
+import { DatePicker } from "@/components/DatePicker";
+import { AmountInputTxn } from "@/components/AmountInputTxn";
+import { CustomSelect } from "@/components/CustomSelect";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,7 +46,7 @@ type Props = {
     onCreateCategory: (name: string) => void;
 };
 
-export default function({
+export const TransactionForm = ({
     id,
     defaultValues,
     onSubmit,
@@ -55,7 +55,7 @@ export default function({
     accountOptions,
     categoryOptions,
     onCreateCategory,
-}: Props) {
+}: Props) => {
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: defaultValues
@@ -194,4 +194,4 @@ export default function({
             )}
         </form>
     </Form>
-}
+};

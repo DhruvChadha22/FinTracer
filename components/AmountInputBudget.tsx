@@ -8,12 +8,12 @@ type Props = {
     disabled?: boolean;
 };
 
-export default function({
+export const AmountInputBudget = ({
     value,
     onChange,
     placeholder,
     disabled
-}: Props) {
+}: Props) => {
     return <div className="relative">
         <span
             className="absolute top-1.5 left-1.5 rounded-md p-2  flex items-center justify-center transition bg-emerald-500 hover:bg-emerald-600"
@@ -32,4 +32,4 @@ export default function({
             disabled={disabled}
         />
     </div>
-}
+};

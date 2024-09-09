@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CalendarIcon, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -12,14 +12,6 @@ import {
     FormItem,
     FormLabel,
 } from "@/components/ui/form";
-import { format } from "date-fns";
-import { 
-    Popover, 
-    PopoverContent, 
-    PopoverTrigger 
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
 
 const formSchema = CategoriesModel.omit({
     id: true,
@@ -36,13 +28,13 @@ type Props = {
     disabled?: boolean;
 };
 
-export default function({
+export const CategoryForm = ({
     id,
     defaultValues,
     onSubmit,
     onDelete,
     disabled,
-}: Props) {
+}: Props) => {
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: defaultValues
@@ -96,4 +88,4 @@ export default function({
             )}
         </form>
     </Form>
-}
+};

@@ -12,11 +12,11 @@ type Props = {
     disabled?: boolean;
 };
 
-export default function({
+export const DatePicker = ({
     value,
     onChange,
     disabled
-}: Props) {
+}: Props) => {
     return <Popover>
         <PopoverTrigger asChild>
             <Button
@@ -41,4 +41,4 @@ export default function({
             />
         </PopoverContent>
     </Popover>
-}
+};

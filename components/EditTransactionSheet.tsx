@@ -9,7 +9,7 @@ import { useGetCategories } from "@/hooks/categories/api/useGetCategories";
 import { useCreateCategory } from "@/hooks/categories/api/useCreateCategory";
 import { useGetAccounts } from "@/hooks/accounts/api/useGetAccounts";
 import { useConfirm } from "@/hooks/useConfirm";
-import TransactionForm from "@/components/TransactionForm";
+import { TransactionForm } from "@/components/TransactionForm";
 import { TransactionsModel } from "@/prisma/zod";
 import { Loader2 } from "lucide-react";
 import { 
@@ -28,7 +28,7 @@ const formSchema = TransactionsModel.omit({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function() {
+export const EditTransactionSheet = () => {
     const { isOpen, onClose, id } = useOpenTransaction();
 
     const transactionQuery = useGetTransaction(id);
@@ -126,4 +126,4 @@ export default function() {
             </SheetContent>
         </Sheet>
     </>
-}
+};

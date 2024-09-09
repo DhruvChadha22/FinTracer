@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
     data?: {
+        id: string;
         name: string;
         value: number;
         remaining: number;
@@ -37,7 +38,7 @@ export const BudgetProgress = ({ data = [] }: Props) => {
                             const percentChange = calculatePercentageChange(budget.remaining, budget.value) * -1;
                             const value = percentChange < 100 ? percentChange : 100;
 
-                            return <div className="flex flex-col gap-1 mb-4">
+                            return <div key={budget.id} className="flex flex-col gap-1 mb-4">
                                 <div className="flex flex-row items-center justify-between">
                                     <span>{budget.name}</span>
                                     <span

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
+import { verifyAuth } from "@hono/auth-js";
 import { prisma } from "@/lib/db";
 import { zValidator } from "@hono/zod-validator";
 import { CategoriesModel } from "@/prisma/zod";
@@ -8,17 +8,17 @@ import { CategoriesModel } from "@/prisma/zod";
 const app = new Hono()
     .get(
         "/", 
-        clerkMiddleware(),
+        verifyAuth(),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
 
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
             const data = await prisma.categories.findMany({
                 where: {
-                    userId: auth.userId
+                    userId: auth.token.id
                 },
                 select: {
                     id: true,
@@ -30,7 +30,7 @@ const app = new Hono()
     })
     .post(
         "/",
-        clerkMiddleware(),
+        verifyAuth(),
         zValidator(
             "json", 
             CategoriesModel.omit({
@@ -39,16 +39,16 @@ const app = new Hono()
             })
         ),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
             const values = c.req.valid("json");
 
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
             const data = await prisma.categories.create({
                 data: {
-                    userId: auth.userId,
+                    userId: auth.token.id,
                     ...values
                 },
             });
@@ -57,7 +57,7 @@ const app = new Hono()
     })
     .get(
         "/:id",
-        clerkMiddleware(),
+        verifyAuth(),
         zValidator(
             "param", 
             z.object({
@@ -65,21 +65,21 @@ const app = new Hono()
             })
         ),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
             const { id } = c.req.valid("param");
 
             if (!id) {
                 return c.json({ error: "Missing id" }, 400);
             }
 
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
             const data = await prisma.categories.findUnique({
                 where: {
                     id: id,
-                    userId: auth.userId
+                    userId: auth.token.id
                 },
                 select: {
                     id: true,
@@ -95,7 +95,7 @@ const app = new Hono()
     })
     .patch(
         "/:id",
-        clerkMiddleware(),
+        verifyAuth(),
         zValidator(
             "param",
             z.object({
@@ -110,7 +110,7 @@ const app = new Hono()
             })
         ),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
             const { id } = c.req.valid("param");
             const values = c.req.valid("json");
 
@@ -118,14 +118,14 @@ const app = new Hono()
                 return c.json({ error: "Missing id" }, 400);
             }
 
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
             const data = await prisma.categories.update({
                 where: {
                     id: id,
-                    userId: auth.userId,
+                    userId: auth.token.id,
                 },
                 data: {
                     ...values
@@ -140,7 +140,7 @@ const app = new Hono()
     })
     .delete(
         "/:id",
-        clerkMiddleware(),
+        verifyAuth(),
         zValidator(
             "param",
             z.object({
@@ -148,21 +148,21 @@ const app = new Hono()
             })
         ),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
             const { id } = c.req.valid("param");
 
             if (!id) {
                 return c.json({ error: "Missing id" }, 400);
             }
 
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
             const data = await prisma.categories.delete({
                 where: {
                     id: id,
-                    userId: auth.userId,
+                    userId: auth.token.id,
                 }
             })
 

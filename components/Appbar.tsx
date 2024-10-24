@@ -1,7 +1,6 @@
-import { ClerkLoaded, ClerkLoading, UserButton } from "@clerk/nextjs";
-import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { UserButton } from "@/components/UserButton";
 
 export const Appbar = () => {
     return <div className="absolute inset-0 z-20 h-fit">
@@ -13,12 +12,7 @@ export const Appbar = () => {
                         <Image src="/logo.svg" alt="Logo" height={30} width={30}/>
                         <span className="ml-1 text-lg font-semibold">FinTracer</span>
                     </Link>
-                    <ClerkLoaded>
-                        <UserButton />
-                    </ClerkLoaded> 
-                    <ClerkLoading>
-                        <Loader2 className="text-white animate-spin"/>
-                    </ClerkLoading>
+                    <UserButton />
                 </div>
             </div>
         </div>

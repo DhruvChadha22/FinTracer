@@ -17,7 +17,7 @@ export const Navbar = () => {
             <Link className="hover:underline" href="#contact">
                 Contact
             </Link>
-            <Link className="hidden lg:inline-flex h-10 items-center justify-center rounded-md bg-green-400 px-5 text-sm font-medium text-black shadow transition-colors hover:bg-green-600" href="/sign-in">
+            <Link className="hidden lg:inline-flex h-10 items-center justify-center rounded-md bg-green-400 px-5 text-sm font-medium text-black shadow transition-colors hover:bg-green-600" href="/login">
                 Try for Free
             </Link>
         </div>

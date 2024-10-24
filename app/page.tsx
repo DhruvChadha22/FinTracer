@@ -4,13 +4,13 @@ import { KeyFeatures } from "@/components/KeyFeatures";
 import { About } from "@/components/About";
 import { ContactUs } from "@/components/ContactUs";
 import { Footer } from "@/components/Footer";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
-export default function LandingPage() {
-    const session = auth();
+export default async function LandingPage() {
+    const session = await auth();
 
-    if(session.userId) {
+    if (session) {
         redirect("/overview");
     }
 

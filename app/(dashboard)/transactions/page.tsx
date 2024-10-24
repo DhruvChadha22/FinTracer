@@ -1,6 +1,8 @@
 "use client";
 
+import { redirect } from "next/navigation";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Loader2, Plus, RefreshCcw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/components/DataTable";
@@ -35,6 +37,12 @@ type Transactions = {
 };
 
 export default function TransactionsPage() {
+    const session = useSession();
+
+    if (!session.data?.user) {
+        redirect("/");
+    }
+
     const [AccountDialog, confirm] = useSelectAccount();
     const [variant, setVariant] = useState<VARIANTS>(VARIANTS.LIST);
     const [importResults, setImportResults] = useState(INITIAL_IMPORT_RESULTS);

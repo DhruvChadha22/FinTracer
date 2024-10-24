@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Hono } from "hono";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
+import { verifyAuth } from "@hono/auth-js";
 import { zValidator } from "@hono/zod-validator";
 import { differenceInDays, parse, subDays } from "date-fns";
 import { prisma } from "@/lib/db";
@@ -35,7 +35,7 @@ type BanksData = {
 const app = new Hono()
     .get(
         "/",
-        clerkMiddleware(),
+        verifyAuth(),
         zValidator(
             "query",
             z.object({
@@ -45,12 +45,12 @@ const app = new Hono()
             })
         ),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
             let { from, to, accountId } = c.req.valid("query");
 
             accountId = accountId ? accountId : null;
 
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
@@ -73,7 +73,7 @@ const app = new Hono()
                     FROM 
                         "Transactions"
                     WHERE 
-                        "userId" = ${auth.userId}
+                        "userId" = ${auth.token?.id}
                         AND date >= ${startDate}
                         AND date <= ${endDate}
                         AND (CAST(${accountId} AS VARCHAR) IS NULL OR "accountId" = ${accountId});
@@ -102,7 +102,7 @@ const app = new Hono()
                 INNER JOIN 
                     "Categories" as categories ON transactions."categoryId" = categories.id
                 WHERE 
-                    transactions."userId" = ${auth.userId}
+                    transactions."userId" = ${auth.token.id}
                     AND amount < 0
                     AND date >= ${startDate}
                     AND date <= ${endDate}
@@ -139,7 +139,7 @@ const app = new Hono()
                 FROM
                     "Transactions"
                 WHERE 
-                    "userId" = ${auth.userId}
+                    "userId" = ${auth.token.id}
                     AND date >= ${startDate}
                     AND date <= ${endDate}
                     AND (CAST(${accountId} AS VARCHAR) IS NULL OR "accountId" = ${accountId})
@@ -159,7 +159,7 @@ const app = new Hono()
 
             const allBudgets = await prisma.budgets.findMany({
                 where: {
-                    userId: auth.userId,
+                    userId: auth.token.id,
                 },
                 orderBy: {
                     amount: "desc",
@@ -173,7 +173,7 @@ const app = new Hono()
                     FROM 
                         "Transactions"
                     WHERE 
-                        "userId" = ${auth.userId}
+                        "userId" = ${auth.token?.id}
                         AND date >= ${budget.startDate}
                         AND date <= ${budget.endDate}
                         AND (CAST(${budget.categoryId} AS VARCHAR) IS NULL OR "categoryId" = ${budget.categoryId});
@@ -218,7 +218,7 @@ const app = new Hono()
                 INNER JOIN 
                     "Accounts" ON "Items".id = "Accounts"."itemId"
                 WHERE
-                    "Items"."userId" = ${auth.userId}
+                    "Items"."userId" = ${auth.token.id}
                 GROUP BY
                     "Items"."bankName"
                 ORDER BY

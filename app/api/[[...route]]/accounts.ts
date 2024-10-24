@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { plaidClient } from "@/lib/plaid";
-import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
+import { AuthUser, verifyAuth } from "@hono/auth-js";
 import { zValidator } from "@hono/zod-validator";
 import { CountryCode, Products } from "plaid";
 import { convertAmountToMiliUnits } from "@/lib/utils";
@@ -10,17 +10,17 @@ import { convertAmountToMiliUnits } from "@/lib/utils";
 const app = new Hono()
     .post(
         "/create_link_token",
-        clerkMiddleware(),
+        verifyAuth(),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
 
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
             
             const plaidRequest = {
                 user: {
-                    client_user_id: auth.userId,
+                    client_user_id: auth.token.id,
                 },
                 client_name: 'FinTracer',
                 products: [Products.Transactions],
@@ -38,7 +38,7 @@ const app = new Hono()
     })
     .post(
         "/exchange_public_token",
-        clerkMiddleware(),
+        verifyAuth(),
         zValidator(
             "json",
             z.object({
@@ -46,10 +46,10 @@ const app = new Hono()
             })
         ),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
             const { publicToken } = c.req.valid("json");
 
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
@@ -63,12 +63,12 @@ const app = new Hono()
                 await prisma.items.create({
                     data: {
                         id: tokenData.item_id,
-                        userId: auth.userId,
+                        userId: auth.token.id,
                         accessToken: tokenData.access_token,
                     }
                 });
                 await populateBankName(tokenData.item_id, tokenData.access_token);
-                await populateAccountNames(tokenData.access_token, auth.userId);
+                await populateAccountNames(tokenData.access_token, auth.token.id);
 
                 return c.json({ message: "Item added successfully" });
             }
@@ -78,17 +78,17 @@ const app = new Hono()
     })
     .get(
         "/banks",
-        clerkMiddleware(),
+        verifyAuth(),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
 
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
             const data = await prisma.items.findMany({
                 where: {
-                    userId: auth.userId,
+                    userId: auth.token.id,
                 },
                 select: {
                     id: true,
@@ -100,7 +100,7 @@ const app = new Hono()
     })
     .get(
         "/",
-        clerkMiddleware(),
+        verifyAuth(),
         zValidator(
             "query",
             z.object({
@@ -108,17 +108,17 @@ const app = new Hono()
             }),
         ),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
             const { itemId } = c.req.valid("query");
             
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
             const data = await prisma.accounts.findMany({
                 where: {
                     itemId: itemId ? itemId : undefined,
-                    userId: auth.userId,
+                    userId: auth.token.id,
                 },
                 select: {
                     id: true,
@@ -132,7 +132,7 @@ const app = new Hono()
     })
     .delete(
         "/",
-        clerkMiddleware(),
+        verifyAuth(),
         zValidator(
             "query",
             z.object({
@@ -140,14 +140,14 @@ const app = new Hono()
             }),
         ),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
             const { itemId } = c.req.valid("query");
 
             if (!itemId) {
                 return c.json({ error: "Missing itemId" }, 400);
             }
 
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
@@ -155,7 +155,7 @@ const app = new Hono()
                 const data = await prisma.items.findUnique({
                     where: {
                         id: itemId,
-                        userId: auth.userId,
+                        userId: auth.token.id,
                     }
                 });
 
@@ -170,7 +170,7 @@ const app = new Hono()
                 await prisma.items.delete({
                     where: {
                         id: itemId,
-                        userId: auth.userId,
+                        userId: auth.token.id,
                     }
                 });
 
@@ -182,22 +182,22 @@ const app = new Hono()
     })
     .post(
         "/sync",
-        clerkMiddleware(),
+        verifyAuth(),
         async (c) => {
-            const auth = getAuth(c);
+            const auth = c.get("authUser");
 
-            if (!auth?.userId) {
+            if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
             const banks = await prisma.items.findMany({
                 where: {
-                    userId: auth.userId,
+                    userId: auth.token.id,
                 },
             });
 
             await Promise.all(banks.map(async (bank) => 
-                await syncBalances(bank.accessToken, auth.userId)
+                await syncBalances(bank.accessToken, auth)
             ));
 
             return c.json({ message: "Balances synced" });       
@@ -265,7 +265,7 @@ const populateAccountNames = async (accessToken: string, userId: string) => {
     }
 };
 
-const syncBalances = async (accessToken: string, userId: string) => {
+const syncBalances = async (accessToken: string, auth: AuthUser) => {
     try {
         const acctsResponse = await plaidClient.accountsBalanceGet({
             access_token: accessToken,
@@ -279,7 +279,7 @@ const syncBalances = async (accessToken: string, userId: string) => {
                 await prisma.accounts.update({
                     where: {
                         id: acct.account_id,
-                        userId: userId,
+                        userId: auth.token?.id,
                         itemId: itemId,
                     },
                     data: {

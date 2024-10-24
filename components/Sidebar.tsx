@@ -10,9 +10,9 @@ import {
     SheetTrigger
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Loader2, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ClerkLoaded, ClerkLoading, UserButton } from "@clerk/nextjs";
+import { UserButton } from "@/components/UserButton";
 
 
 const routes = [
@@ -66,12 +66,7 @@ export const Sidebar = () => {
                             <Menu className="size-4" />
                         </Button>
                     </SheetTrigger>
-                    <ClerkLoaded>
-                        <UserButton />
-                    </ClerkLoaded> 
-                    <ClerkLoading>
-                        <Loader2 className="text-white animate-spin"/>
-                    </ClerkLoading>
+                    <UserButton />
                 </div>
             </div>
             <SheetContent side="left" className="bg-gray-900 w-fit px-3 border-none">

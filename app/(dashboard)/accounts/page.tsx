@@ -1,5 +1,7 @@
 "use client";
 
+import { redirect } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { FileSearch, Loader2, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -12,6 +14,12 @@ import { useSyncBalances } from "@/hooks/accounts/api/useSyncBalances";
 
 
 export default function AccountsPage() {
+    const session = useSession();
+
+    if (!session.data?.user) {
+        redirect("/");
+    }
+
     const getBanksQuery = useGetBankNames();
     const syncBalances = useSyncBalances();
 
@@ -69,7 +77,7 @@ export default function AccountsPage() {
                     </div>
                 )
                 : (  
-                    <AccountCards />
+                    <AccountCards name={session.data.user.name || ""} />
                 )}
             </CardContent>
         </Card>

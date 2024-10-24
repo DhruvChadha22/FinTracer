@@ -10,7 +10,7 @@ export const MainPage = () => {
                     FinTracer is a powerful tool that helps you track your expenses, create budgets, and generate financial reports.
                 </p>
                 <div className="flex gap-4">
-                    <Link className="inline-flex h-10 items-center justify-center rounded-md bg-green-400 px-8 text-sm font-medium text-black shadow transition-colors hover:bg-green-600" href="/sign-in">
+                    <Link className="inline-flex h-10 items-center justify-center rounded-md bg-green-400 px-8 text-sm font-medium text-black shadow transition-colors hover:bg-green-600" href="/login">
                         Get Started
                     </Link>
                     <Link className="inline-flex h-10 items-center justify-center rounded-md border border-green-400 bg-transparent px-8 text-sm font-medium shadow-sm transition-colors hover:bg-green-100 hover:text-black" href="#about">Learn More</Link>

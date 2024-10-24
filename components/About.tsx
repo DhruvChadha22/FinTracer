@@ -14,7 +14,7 @@ export const About = () => {
                 </p>
                 <Link
                 className="inline-flex h-10 items-center justify-center rounded-md bg-green-400 px-8 text-sm font-medium text-black shadow transition-colors hover:bg-green-600"
-                href="/sign-in"
+                href="/login"
                 >
                     Get Started
                 </Link>

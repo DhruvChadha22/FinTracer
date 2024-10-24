@@ -1,5 +1,7 @@
 "use client";
 
+import { redirect } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { DataTable } from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
@@ -11,6 +13,12 @@ import { useDeleteBudgets } from "@/hooks/budgets/api/useDeleteBudgets";
 
 
 export default function BudgetsPage() {
+    const session = useSession();
+
+    if (!session.data?.user) {
+        redirect("/");
+    }
+
     const { onOpen } = useNewBudget();
 
     const deleteBudgets = useDeleteBudgets();

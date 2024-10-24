@@ -2,15 +2,13 @@ import React from 'react'
 import Image from 'next/image'
 import { Loader2 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
-import { useUser } from '@clerk/nextjs';
 import { useGetAccounts } from '@/hooks/accounts/api/useGetAccounts';
 
-export const AccountCards = () => {
-    const { isLoaded, user } = useUser();
+export const AccountCards = ({ name }: { name: string }) => {
     const accountsQuery = useGetAccounts();
     const accounts = accountsQuery.data || [];
 
-    if (accountsQuery.isLoading || !isLoaded) {
+    if (accountsQuery.isLoading) {
         return <div className="h-[400px] w-full flex items-center justify-center">
             <Loader2 className="size-6 text-slate-300 animate-spin" />
         </div>
@@ -33,7 +31,7 @@ export const AccountCards = () => {
                         <div className="flex flex-col gap-2">
                             <div className="flex justify-between">
                                 <h1 className="text-[12px] leading-[16px] font-semibold text-white">
-                                    {user?.firstName}
+                                    {name}
                                 </h1>
                                 <h2 className="text-[12px] leading-[16px] font-semibold text-white">
                                     ●● / ●●

@@ -21,6 +21,7 @@ export const useSyncTransactions = () => {
             toast.success("Transactions synced");
             queryClient.invalidateQueries({ queryKey: ["transactions"] });
             queryClient.invalidateQueries({ queryKey: ["overview"] });
+            queryClient.invalidateQueries({ queryKey: ["categories"] });
         },
         onError: () => {
             toast.error("Failed to sync transactions");

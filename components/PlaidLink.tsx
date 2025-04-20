@@ -5,6 +5,11 @@ import { useCreateBank } from "@/hooks/accounts/api/useCreateBank";
 import { useGetLinkToken } from "@/hooks/accounts/api/useGetLinkToken";
 import { useSyncTransactions } from "@/hooks/transactions/api/useSyncTransactions";
 
+type ResponseType = {
+    id: string;
+    bankName: string | null;
+};
+
 export const PlaidLink = () => {
     const linkQuery = useGetLinkToken();
     const addBankQuery = useCreateBank();
@@ -16,8 +21,10 @@ export const PlaidLink = () => {
         token: linkToken,
         onSuccess: (public_token, metadata) => {
             addBankQuery.mutate({ publicToken: public_token }, {
-                onSuccess: () => {
-                    syncTransactions.mutate();
+                onSuccess: (data) => {
+                    if (Object.getPrototypeOf(data) === Object.getPrototypeOf({id: "", bankName: ""})) {
+                        syncTransactions.mutate([data as ResponseType]);
+                    }
                 },
             });
         },

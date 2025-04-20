@@ -291,31 +291,50 @@ const app = new Hono()
     .post(
         "/sync",
         verifyAuth(),
+        zValidator(
+            "json",
+            z.object({
+                itemId: z.string(),
+            }),
+        ),
         async (c) => {
             const auth = c.get("authUser");
+            const { itemId } = c.req.valid("json");
+
+            if (!itemId) {
+                return c.json({ error: "Missing itemId" }, 400);
+            }
 
             if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
-            const items = await prisma.items.findMany({
-                where: {
-                    userId: auth.token.id,
-                },
-                select: {
-                    id: true,
-                    userId: true,
-                    accessToken: true,
-                    txnCursor: true,
+            try {
+                const bank = await prisma.items.findUnique({
+                    where: {
+                        id: itemId,
+                        userId: auth.token.id,
+                    },
+                    select: {
+                        id: true,
+                        userId: true,
+                        accessToken: true,
+                        txnCursor: true,
+                    }
+                });
+
+                if (!bank) {
+                    return c.json({ error: "Not found" }, 404);
                 }
-            });
 
-            await Promise.all(
-                items.map(async (item) => await syncTransactions(item))
-            );
+                await syncTransactions(bank);
 
-            return c.json({ message: "Transactions synced" });
-    })
+                return c.json({ message: "Transactions synced" });
+            }
+            catch(error) {
+                return c.json({ error: "Failure" }, 500);
+            }
+    });
 
 
 type ItemProps = z.infer<typeof ItemsModel>;
@@ -369,12 +388,12 @@ const applyUpdates = async ({
     await addTxnsAndCategories(userId, added);
     await addTxnsAndCategories(userId, modified);
 
-    const txns = removed.map((txnObj) => txnObj.transaction_id);
+    const removedTxnIds = removed.map((txnObj) => txnObj.transaction_id);
 
     await prisma.transactions.deleteMany({
         where: {
             id: {
-                in: txns
+                in: removedTxnIds
             }
         }
     });

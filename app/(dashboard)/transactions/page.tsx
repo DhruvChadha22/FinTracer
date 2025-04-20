@@ -17,6 +17,7 @@ import { useDeleteTransactions } from "@/hooks/transactions/api/useDeleteTransac
 import { useSelectAccount } from "@/hooks/useSelectAccount";
 import { useCreateTransactions } from "@/hooks/transactions/api/useCreateTransactions";
 import { useSyncTransactions } from "@/hooks/transactions/api/useSyncTransactions";
+import { useGetBankNames } from "@/hooks/accounts/api/useGetBankNames";
 
 
 enum VARIANTS {
@@ -62,8 +63,11 @@ export default function TransactionsPage() {
     const deleteTransactions = useDeleteTransactions();
     const transactionsQuery = useGetTransactions();
     const createTransactions = useCreateTransactions();
+
+    const getBanksQuery = useGetBankNames();
     const syncTransactions = useSyncTransactions();
 
+    const banksData = getBanksQuery.data || [];
     const transactions = transactionsQuery.data || [];
     
     const isDisabled = deleteTransactions.isPending || transactionsQuery.isLoading || syncTransactions.isPending;
@@ -120,10 +124,10 @@ export default function TransactionsPage() {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-2 lg:mb-0">
             <Filters />
             <Button 
-                onClick={() => syncTransactions.mutate()} 
+                onClick={() => syncTransactions.mutate(banksData)} 
                 size="sm"
                 variant="outline"
-                disabled={syncTransactions.isPending}
+                disabled={banksData.length === 0 || getBanksQuery.isLoading || syncTransactions.isPending}
                 className="bg-white/50 hover:bg-white/60 focus:bg-white/70 font-normal"
             >
                 <RefreshCcw className="size-4 mr-2" />

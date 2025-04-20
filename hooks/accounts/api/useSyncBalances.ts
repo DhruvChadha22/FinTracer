@@ -2,13 +2,20 @@ import { toast } from "sonner";
 import { client } from "@/lib/hono";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+type ResponseType = void;
+type RequestType = {
+    id: string;
+    bankName: string | null;
+}[];
+
 export const useSyncBalances = () => {
     const queryClient = useQueryClient();
 
-    const mutation = useMutation({
-        mutationFn: async () => {
-            const res = await client.api.accounts["sync"]["$post"]();
-            return await res.json();
+    const mutation = useMutation<ResponseType, Error, RequestType>({
+        mutationFn: async (banksData) => {
+            await Promise.all(banksData.map(async (bank) => (
+                await client.api.accounts.sync.$post({ json: { itemId: bank.id } })
+            )));
         },
         onSuccess: () => {
             toast.success("Balances synced");

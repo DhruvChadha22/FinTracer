@@ -25,7 +25,7 @@ export default function AccountsPage() {
 
     const banksData = getBanksQuery.data || [];
 
-    const isDisabled = banksData.length === 0 || syncBalances.isPending;
+    const isDisabled = banksData.length === 0 || syncBalances.isPending || getBanksQuery.isLoading;
 
     if (getBanksQuery.isLoading) {
         return <div className="w-full pr-4">
@@ -48,7 +48,7 @@ export default function AccountsPage() {
         </h2>
         <div className="flex items-center justify-end mb-1">
             <Button 
-                onClick={() => syncBalances.mutate()} 
+                onClick={() => syncBalances.mutate(banksData)} 
                 size="sm"
                 variant="outline"
                 disabled={isDisabled}

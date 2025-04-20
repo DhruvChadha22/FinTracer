@@ -60,17 +60,60 @@ const app = new Hono()
                 
                 const tokenData = plaidResponse.data;
 
-                await prisma.items.create({
+                //Create Item and Add Item Name
+                const connectedBank = await prisma.items.create({
                     data: {
                         id: tokenData.item_id,
                         userId: auth.token.id,
                         accessToken: tokenData.access_token,
                     }
                 });
-                await populateBankName(tokenData.item_id, tokenData.access_token);
-                await populateAccountNames(tokenData.access_token, auth.token.id);
 
-                return c.json({ message: "Item added successfully" });
+                const itemResponse = await plaidClient.itemGet({
+                    access_token: tokenData.access_token,
+                });
+        
+                const institutionId = itemResponse.data.item.institution_id;
+        
+                if (institutionId) {
+                    const institutionResponse = await plaidClient.institutionsGetById({
+                        institution_id: institutionId,
+                        country_codes: [CountryCode.Us],
+                    });
+            
+                    const institutionName = institutionResponse.data.institution.name;
+                    await prisma.items.update({
+                        where: {
+                            id: tokenData.item_id,
+                        },
+                        data: {
+                            bankName: institutionName,
+                        },
+                    });
+                }
+
+                //Add Accounts
+                const plaidAccounts = await plaidClient.accountsGet({
+                    access_token: tokenData.access_token,
+                });
+
+                const newAccounts = plaidAccounts.data.accounts.map((acct) => ({
+                    id: acct.account_id,
+                    userId: auth.token?.id!,
+                    name: acct.name,
+                    itemId: plaidAccounts.data.item.item_id,
+                    balance: convertAmountToMiliUnits(acct.balances.current ?? acct.balances.available!),
+                    mask: acct.mask,
+                }));
+
+                await prisma.accounts.createMany({
+                    data: newAccounts,
+                });
+                
+                return c.json({ 
+                    id: connectedBank.id,
+                    bankName: connectedBank.bankName,
+                });
             }
             catch (error) {
                 return c.json({ error: "Failure" }, 500);
@@ -183,114 +226,65 @@ const app = new Hono()
     .post(
         "/sync",
         verifyAuth(),
+        zValidator(
+            "json",
+            z.object({
+                itemId: z.string(),
+            }),
+        ),
         async (c) => {
             const auth = c.get("authUser");
+            const { itemId } = c.req.valid("json");
+
+            if (!itemId) {
+                return c.json({ error: "Missing itemId" }, 400);
+            }
 
             if (!auth.token?.id) {
                 return c.json({ error: "Unauthorized" }, 401);
             }
 
-            const banks = await prisma.items.findMany({
-                where: {
-                    userId: auth.token.id,
-                },
-            });
-
-            await Promise.all(banks.map(async (bank) => 
-                await syncBalances(bank.accessToken, auth)
-            ));
-
-            return c.json({ message: "Balances synced" });       
-    });
-
-
-const populateBankName = async (itemId: string, accessToken: string) => {
-    try {
-        const itemResponse = await plaidClient.itemGet({
-            access_token: accessToken,
-        });
-
-        const institutionId = itemResponse.data.item.institution_id;
-
-        if (institutionId == null) {
-            return;
-        }
-
-        const institutionResponse = await plaidClient.institutionsGetById({
-            institution_id: institutionId,
-            country_codes: [CountryCode.Us],
-        });
-
-        const institutionName = institutionResponse.data.institution.name;
-        await prisma.items.update({
-            where: {
-                id: itemId,
-            },
-            data: {
-                bankName: institutionName,
-            },
-        });
-
-    } catch (error) {
-        console.log(error);
-    }
-};
-    
-const populateAccountNames = async (accessToken: string, userId: string) => {
-    try {
-        const acctsResponse = await plaidClient.accountsGet({
-            access_token: accessToken,
-        });
-
-        const acctsData = acctsResponse.data;
-        const itemId = acctsData.item.item_id;
-
-        await Promise.all(
-            acctsData.accounts.map(async (acct) => {
-                await prisma.accounts.create({
-                    data: {
-                        id: acct.account_id,
-                        userId: userId,
-                        name: acct.name,
-                        itemId: itemId,
-                        balance: convertAmountToMiliUnits(acct.balances.current ?? acct.balances.available!),
-                        mask: acct.mask,
-                    },
-                });
-            })
-        );
-
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-const syncBalances = async (accessToken: string, auth: AuthUser) => {
-    try {
-        const acctsResponse = await plaidClient.accountsBalanceGet({
-            access_token: accessToken,
-        });
-
-        const acctsData = acctsResponse.data;
-        const itemId = acctsData.item.item_id;
-
-        await Promise.all(
-            acctsData.accounts.map(async (acct) => {
-                await prisma.accounts.update({
+            try {
+                const bank = await prisma.items.findUnique({
                     where: {
-                        id: acct.account_id,
-                        userId: auth.token?.id,
-                        itemId: itemId,
+                        id: itemId,
+                        userId: auth.token.id,
                     },
-                    data: {
-                        balance: convertAmountToMiliUnits(acct.balances.current ?? acct.balances.available!),
+                    select: {
+                        accessToken: true,
                     },
                 });
-            })
-        );
-    } catch (error) {
-        console.log(error);
-    }
-};
+
+                if (!bank) {
+                    return c.json({ error: "Not found" }, 404);
+                }
+
+                const acctsResponse = await plaidClient.accountsBalanceGet({
+                    access_token: bank.accessToken,
+                });
+        
+                const acctsData = acctsResponse.data;
+                
+                await Promise.all(
+                    acctsData.accounts.map(async (acct) => {
+                        await prisma.accounts.update({
+                            where: {
+                                id: acct.account_id,
+                                userId: auth.token?.id,
+                                itemId: itemId,
+                            },
+                            data: {
+                                balance: convertAmountToMiliUnits(acct.balances.current ?? acct.balances.available!),
+                            },
+                        });
+                    })
+                );
+
+                return c.json({ message: "Balances synced" }); 
+            } 
+            catch(error) {
+                return c.json({ error: "Failure" }, 500);
+            }     
+    });
 
 export default app;

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { plaidClient } from "@/lib/plaid";
-import { AuthUser, verifyAuth } from "@hono/auth-js";
+import { verifyAuth } from "@hono/auth-js";
 import { zValidator } from "@hono/zod-validator";
 import { CountryCode, Products } from "plaid";
 import { convertAmountToMiliUnits } from "@/lib/utils";
@@ -265,22 +265,31 @@ const app = new Hono()
         
                 const acctsData = acctsResponse.data;
                 
-                await Promise.all(
-                    acctsData.accounts.map(async (acct) => {
-                        await prisma.accounts.update({
-                            where: {
-                                id: acct.account_id,
-                                userId: auth.token?.id,
-                                itemId: itemId,
-                            },
-                            data: {
-                                balance: convertAmountToMiliUnits(acct.balances.current ?? acct.balances.available!),
-                            },
-                        });
-                    })
-                );
+                const values: string[] = [];
+                const params: unknown[] = [auth.token.id, itemId];
 
-                return c.json({ message: "Balances synced" }); 
+                acctsData.accounts.forEach((acct, _ind) => {
+                    const balance = convertAmountToMiliUnits(acct.balances.current ?? acct.balances.available!);
+                    values.push(`($${params.length + 1}, $${params.length + 2})`);
+                    params.push(acct.account_id, balance);
+                });
+
+                const sql = `
+                    UPDATE "Accounts" AS a 
+                    SET
+                        balance = v.balance
+                    FROM (
+                        VALUES
+                        ${values.join(',\n')}
+                    ) AS v(id, balance)
+                    WHERE a.id = v.id
+                      AND a."userId" = $1
+                      AND a."itemId" = $2;
+                `;
+
+                await prisma.$executeRawUnsafe(sql, ...params);
+                
+                return c.json({ message: "Balances synced" });                 
             } 
             catch(error) {
                 return c.json({ error: "Failure" }, 500);

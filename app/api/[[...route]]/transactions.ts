@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import { zValidator } from "@hono/zod-validator";
 import { ItemsModel, TransactionsModel } from "@/prisma/zod";
 import { plaidClient } from "@/lib/plaid";
-import { RemovedTransaction, Transaction, TransactionsSyncRequest } from "plaid";
+import { RemovedTransaction, Transaction } from "plaid";
 import { convertAmountToMiliUnits, formatCategory } from "@/lib/utils";
 
 const app = new Hono()
@@ -341,35 +341,33 @@ type ItemProps = z.infer<typeof ItemsModel>;
 type UpdateProps = {
     id: string;
     userId: string;
-    added: Array<Transaction>;
-    modified: Array<Transaction>;
-    removed: Array<RemovedTransaction>;
+    added: Transaction[];
+    modified: Transaction[];
+    removed: RemovedTransaction[];
     txnCursor: string | null | undefined; 
 };
 
 const syncTransactions = async ({
-    id, 
-    userId, 
-    accessToken, 
+    id,
+    userId,
+    accessToken,
     txnCursor,
 }: ItemProps) => {
-    let added: Array<Transaction> = [];
-    let modified: Array<Transaction> = [];
-    let removed: Array<RemovedTransaction> = [];
+    let added: Transaction[] = [];
+    let modified: Transaction[] = [];
+    let removed: RemovedTransaction[] = [];
     let hasMore = true;
 
     while (hasMore) {
-        const request: TransactionsSyncRequest = {
+        const response = await plaidClient.transactionsSync({
             access_token: accessToken,
             cursor: txnCursor ?? undefined,
-        };
-        const response = await plaidClient.transactionsSync(request);
+        });
+
         const data = response.data;
-
-        added = added.concat(data.added);
-        modified = modified.concat(data.modified);
-        removed = removed.concat(data.removed);
-
+        added.push(...data.added);
+        modified.push(...data.modified);
+        removed.push(...data.removed);
         hasMore = data.has_more;
         txnCursor = data.next_cursor;
     }
@@ -385,76 +383,141 @@ const applyUpdates = async ({
     removed,
     txnCursor,
 }: UpdateProps) => {
-    await addTxnsAndCategories(userId, added);
-    await addTxnsAndCategories(userId, modified);
+    //Process all categories for both added and modified
+    const allTxns = [...added, ...modified];
+    const categoriesMap = await resolveCategories(userId, allTxns);
+    
+    //Add, Update and Delete Transactions
+    const removedTxnIds = removed.map((txn) => txn.transaction_id);
+    await Promise.all([
+        insertTxns(userId, added, categoriesMap),
+        updateTxns(modified, categoriesMap),
+        prisma.transactions.deleteMany({
+            where: { 
+                id: { 
+                    in: removedTxnIds,
+                },
+            },
+        }),
+    ]);
 
-    const removedTxnIds = removed.map((txnObj) => txnObj.transaction_id);
-
-    await prisma.transactions.deleteMany({
-        where: {
-            id: {
-                in: removedTxnIds
-            }
-        }
-    });
-  
+    //Update cursor
     await prisma.items.update({
-        where: {
-            id: id,
-        },
-        data: {
-            txnCursor: txnCursor,
-        },
+        where: { id },
+        data: { txnCursor },
     });
 };
 
-const addTxnsAndCategories = async (userId: string, txnArray: Array<Transaction>) => {
-    for (const txn of txnArray) {
-        let category;
+const resolveCategories = async (
+    userId: string,
+    txnArray: Transaction[]
+) => {
+    const rawCategories = txnArray
+        .filter((txn) => txn.personal_finance_category?.primary)
+        .map((txn) => formatCategory(txn.personal_finance_category!.primary));
 
-        if (txn.personal_finance_category?.primary) {
-            category = await prisma.categories.findFirst({
-                where: {
-                    userId: userId,
-                    name: formatCategory(txn.personal_finance_category.primary),
-                },
-                select: {
-                    id: true,
-                },
-            });
+    //Remove Duplicates
+    const categoryNames = rawCategories.filter((value, index, self) => self.indexOf(value) === index);
 
-            if (!category?.id) {
-                category = await prisma.categories.create({
-                    data: {
-                        userId: userId,
-                        name: formatCategory(txn.personal_finance_category.primary),
-                    },
-                });
-            }
-        }
+    const existing = await prisma.categories.findMany({
+        where: { 
+            userId, 
+            name: { 
+                in: categoryNames,
+            },
+        },
+    });
 
-        await prisma.transactions.upsert({
-            where: {
-                id: txn.transaction_id,
-            },
-            update: {
-                name: txn.merchant_name ?? txn.name,
-                amount: convertAmountToMiliUnits(txn.amount * -1),
-                date: txn.authorized_date ? new Date(txn.authorized_date) : new Date(txn.date),
-                accountId: txn.account_id,
-                categoryId: category?.id,
-            },
-            create: {
-                id: txn.transaction_id,
-                userId: userId,
-                name: txn.merchant_name ?? txn.name,
-                amount: convertAmountToMiliUnits(txn.amount * -1),
-                date: txn.authorized_date ? new Date(txn.authorized_date) : new Date(txn.date),
-                accountId: txn.account_id,
-                categoryId: category?.id,
-            },
-        });
+    const categoriesMap = new Map<string, string>();
+    for (const cat of existing) {
+        categoriesMap.set(cat.name, cat.id);
     }
+
+    const missing = categoryNames.filter((name) => !categoriesMap.has(name));
+
+    if (missing.length > 0) {
+        const created = await prisma.$transaction(
+            missing.map((name) =>
+                prisma.categories.create({ 
+                    data: { 
+                        userId, 
+                        name,
+                    },
+                })
+            )
+        );
+        for (const cat of created) {
+            categoriesMap.set(cat.name, cat.id);
+        }
+    }
+
+    return categoriesMap;
+};
+
+const insertTxns = async (
+    userId: string,
+    txnArray: Transaction[],
+    categoriesMap: Map<string, string>
+) => {
+    if (txnArray.length === 0) return;
+
+    const newTxns = txnArray.map((txn) => ({
+        id: txn.transaction_id,
+        userId,
+        name: txn.merchant_name ?? txn.name,
+        amount: convertAmountToMiliUnits(txn.amount * -1),
+        date: new Date(txn.authorized_date ?? txn.date),
+        accountId: txn.account_id,
+        categoryId: txn.personal_finance_category?.primary
+            ? categoriesMap.get(formatCategory(txn.personal_finance_category.primary))
+            : undefined,
+    }));
+
+    await prisma.transactions.createMany({
+        data: newTxns,
+    });
+};
+
+const updateTxns = async (
+    txnArray: Transaction[],
+    categoriesMap: Map<string, string>
+) => {
+    if (txnArray.length === 0) return;
+
+    const values: string[] = [];
+    const params: unknown[] = [];
+
+    txnArray.forEach((txn, index) => {
+        const id = txn.transaction_id;
+        const name = txn.merchant_name ?? txn.name;
+        const amount = convertAmountToMiliUnits(txn.amount * -1);
+        const date = new Date(txn.authorized_date ?? txn.date);
+        const accountId = txn.account_id;
+        const categoryId = txn.personal_finance_category?.primary
+            ? categoriesMap.get(formatCategory(txn.personal_finance_category.primary))
+            : null;
+
+        const paramStart = index * 6 + 1; // 6 params per row
+        values.push(`($${paramStart}, $${paramStart + 1}, $${paramStart + 2}, $${paramStart + 3}, $${paramStart + 4}, $${paramStart + 5})`);
+        params.push(id, name, amount, date, accountId, categoryId);
+    });
+
+    const sql = `
+        UPDATE "Transactions" AS t 
+        SET
+            name = v.name,
+            amount = v.amount,
+            date = v.date,
+            "accountId" = v."accountId",
+            "categoryId" = v."categoryId"
+        FROM (
+            VALUES
+            ${values.join(',\n')}
+        ) AS v(id, name, amount, date, "accountId", "categoryId")
+        WHERE t.id = v.id;
+    `;
+
+    await prisma.$executeRawUnsafe(sql, ...params);
 };
 
 export default app;

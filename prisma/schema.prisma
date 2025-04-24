@@ -68,7 +68,7 @@ model Budgets {
   categoryId      String?
   category        Categories?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@unique([startDate, endDate])
+  @@unique([userId, startDate, endDate])
 }
 
 // Schemas for Next-Auth user
